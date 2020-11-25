@@ -59,7 +59,7 @@ func BuildGSMPDUSessionEstablishmentAccept(smContext *SMContext) ([]byte, error)
 			DQR:           0x01,
 			OperationCode: OperationCodeCreateNewQoSRule,
 			Precedence:    0xff,
-			QFI:           uint8(authDefQos.Var5qi),
+			QFI:           uint8(1),
 			PacketFilterList: []PacketFilter{
 				{
 					Identifier:    0x01,
@@ -90,7 +90,7 @@ func BuildGSMPDUSessionEstablishmentAccept(smContext *SMContext) ([]byte, error)
 	pDUSessionEstablishmentAccept.AuthorizedQosFlowDescriptions =
 		nasType.NewAuthorizedQosFlowDescriptions(nasMessage.PDUSessionEstablishmentAcceptAuthorizedQosFlowDescriptionsType)
 	pDUSessionEstablishmentAccept.AuthorizedQosFlowDescriptions.SetLen(6)
-	pDUSessionEstablishmentAccept.SetQoSFlowDescriptions([]uint8{uint8(authDefQos.Var5qi), 0x20, 0x41, 0x01, 0x01, 0x09})
+	pDUSessionEstablishmentAccept.SetQoSFlowDescriptions([]uint8{uint8(1), 0x20, 0x41, 0x01, 0x01, uint8(authDefQos.Var5qi)})
 
 	pDUSessionEstablishmentAccept.Cause5GSM = nasType.NewCause5GSM(nasMessage.PDUSessionEstablishmentAcceptCause5GSMType)
 	pDUSessionEstablishmentAccept.Cause5GSM.SetCauseValue(nasMessage.Cause5GSMPDUSessionTypeIPv4OnlyAllowed)

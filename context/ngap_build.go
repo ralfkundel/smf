@@ -16,6 +16,18 @@ func BuildPDUSessionResourceSetupRequestTransfer(ctx *SMContext) ([]byte, error)
 
 	resourceSetupRequestTransfer := ngapType.PDUSessionResourceSetupRequestTransfer{}
 
+	ie2 := ngapType.PDUSessionResourceSetupRequestTransferIEs{}
+	ie2.Id.Value = ngapType.ProtocolIEIDPDUSessionAggregateMaximumBitRate
+	ie2.Criticality.Value = ngapType.CriticalityPresentReject
+	ie2.Value = ngapType.PDUSessionResourceSetupRequestTransferIEsValue{
+		Present: ngapType.PDUSessionResourceSetupRequestTransferIEsPresentPDUSessionAggregateMaximumBitRate,
+		PDUSessionAggregateMaximumBitRate: &ngapType.PDUSessionAggregateMaximumBitRate{
+			PDUSessionAggregateMaximumBitRateDL: ngapType.BitRate{Value: 3000000000}, //TODO currently hardcoded
+			PDUSessionAggregateMaximumBitRateUL: ngapType.BitRate{Value: 1000000000}, //TODO currently hardcoded
+		},
+	}
+	resourceSetupRequestTransfer.ProtocolIEs.List = append(resourceSetupRequestTransfer.ProtocolIEs.List, ie2)
+
 	// UL NG-U UP TNL Information
 	ie := ngapType.PDUSessionResourceSetupRequestTransferIEs{}
 	ie.Id.Value = ngapType.ProtocolIEIDULNGUUPTNLInformation
@@ -51,6 +63,10 @@ func BuildPDUSessionResourceSetupRequestTransfer(ctx *SMContext) ([]byte, error)
 
 	// QoS Flow Setup Request List
 	// use Default 5qi, arp
+
+	sessRule := ctx.SelectedSessionRule()
+	authDefQos := sessRule.AuthDefQos
+
 	ie = ngapType.PDUSessionResourceSetupRequestTransferIEs{}
 	ie.Id.Value = ngapType.ProtocolIEIDQosFlowSetupRequestList
 	ie.Criticality.Value = ngapType.CriticalityPresentReject
@@ -60,14 +76,14 @@ func BuildPDUSessionResourceSetupRequestTransfer(ctx *SMContext) ([]byte, error)
 			List: []ngapType.QosFlowSetupRequestItem{
 				{
 					QosFlowIdentifier: ngapType.QosFlowIdentifier{
-						Value: 0,
+						Value: 1,
 					},
 					QosFlowLevelQosParameters: ngapType.QosFlowLevelQosParameters{
 						QosCharacteristics: ngapType.QosCharacteristics{
 							Present: ngapType.QosCharacteristicsPresentNonDynamic5QI,
 							NonDynamic5QI: &ngapType.NonDynamic5QIDescriptor{
 								FiveQI: ngapType.FiveQI{
-									Value: 9,
+									Value: int64(authDefQos.Var5qi),
 								},
 							},
 						},
