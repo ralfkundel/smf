@@ -145,6 +145,15 @@ func BuildGSMPDUSessionEstablishmentAccept(smContext *SMContext) ([]byte, error)
 				}
 			}
 
+			if smContext.Dnn == "ims" { //TODO move to config file
+				//1. add P-CSCF IPv4 (0x000c)
+				//IP of IMS server
+				//Length: 4
+				//Value: e.g. 1.2.3.4
+				PcSCFaddress := net.ParseIP("172.16.5.100") //TODO read from config file if exists
+				protocolConfigurationOptions.AddPCscfIPv4Address(PcSCFaddress)
+			}
+
 			// MTU
 			if smContext.ProtocolConfigurationOptions.IPv4LinkMTURequest {
 				err := protocolConfigurationOptions.AddIPv4LinkMTU(1400)
