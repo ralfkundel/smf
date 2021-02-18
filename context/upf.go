@@ -111,6 +111,10 @@ func (i *UPFInterfaceInfo) IP(pduSessType uint8) (net.IP, error) {
 		return i.IPv6EndPointAddresses[0], nil
 	}
 
+	if pduSessType == nasMessage.PDUSessionTypeIPv4IPv6 && len(i.IPv4EndPointAddresses) != 0 {
+		return i.IPv4EndPointAddresses[0], nil
+	}
+
 	if i.EndpointFQDN != "" {
 		if resolvedAddr, err := net.ResolveIPAddr("ip", i.EndpointFQDN); err != nil {
 			logger.CtxLog.Errorf("resolve addr [%s] failed", i.EndpointFQDN)
