@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"github.com/free5gc/aper"
+	"github.com/free5gc/ngap/ngapConvert"
 	"github.com/free5gc/ngap/ngapType"
 )
 
@@ -52,6 +53,22 @@ func BuildPDUSessionResourceSetupRequestTransfer(ctx *SMContext) ([]byte, error)
 		Present: ngapType.PDUSessionResourceSetupRequestTransferIEsPresentPDUSessionType,
 		PDUSessionType: &ngapType.PDUSessionType{
 			Value: ngapType.PDUSessionTypePresentIpv4,
+		},
+	}
+	resourceSetupRequestTransfer.ProtocolIEs.List = append(resourceSetupRequestTransfer.ProtocolIEs.List, ie)
+
+	//PDUSessionAggregateMaximumBitRate
+	sessionRule := ctx.SelectedSessionRule()
+	ulSessionRate := ngapConvert.UEAmbrToInt64(sessionRule.AuthSessAmbr.Uplink)
+	dlSessionRate := ngapConvert.UEAmbrToInt64(sessionRule.AuthSessAmbr.Downlink)
+	ie = ngapType.PDUSessionResourceSetupRequestTransferIEs{}
+	ie.Id.Value = ngapType.ProtocolIEIDPDUSessionAggregateMaximumBitRate
+	ie.Criticality.Value = ngapType.CriticalityPresentReject
+	ie.Value = ngapType.PDUSessionResourceSetupRequestTransferIEsValue{
+		Present: ngapType.PDUSessionResourceSetupRequestTransferIEsPresentPDUSessionAggregateMaximumBitRate,
+		PDUSessionAggregateMaximumBitRate: &ngapType.PDUSessionAggregateMaximumBitRate{
+			PDUSessionAggregateMaximumBitRateDL: ngapType.BitRate{Value: dlSessionRate},
+			PDUSessionAggregateMaximumBitRateUL: ngapType.BitRate{Value: ulSessionRate},
 		},
 	}
 	resourceSetupRequestTransfer.ProtocolIEs.List = append(resourceSetupRequestTransfer.ProtocolIEs.List, ie)
